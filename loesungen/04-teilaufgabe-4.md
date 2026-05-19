@@ -1,7 +1,9 @@
 # 04 – Integrationstests als Java-Code (kommentiert)
 
 ## Ziel
-Du hast recht: Nur Test-Ideen reichen nicht. Hier sind jetzt **konkrete Java-Tests** (mit Kommentaren), die du unter `backend/src/test/java/...` anlegen kannst.
+Du hast recht: Nur Test-Ideen reichen nicht. Hier sind jetzt **konkrete Java-Tests** (mit Kommentaren).
+
+**Wunsch gemäß Vorgabe:** Die Klassen sollen unter **`/backend/test`** erstellt werden (nur so in der Doku ergänzt).
 
 > Hinweis: Die Tests prüfen bewusst nur die Aufgaben aus README/TODO. Keine Extra-Features.
 
@@ -9,7 +11,7 @@ Du hast recht: Nur Test-Ideen reichen nicht. Hier sind jetzt **konkrete Java-Tes
 
 ## A) Tests für `WebsocketServer` (mind. 3)
 
-### Datei: `backend/src/test/java/de/berlin/htw/boundary/ws/WebsocketServerIT.java`
+### Datei: `/backend/test/de/berlin/htw/boundary/ws/WebsocketServerTest.java`
 ```java
 package de.berlin.htw.boundary.ws;
 
@@ -30,7 +32,7 @@ import jakarta.websocket.OnMessage;
 import jakarta.websocket.Session;
 
 @QuarkusTest
-class WebsocketServerIT {
+class WebsocketServerTest {
 
     /**
      * Einfacher Test-Client, der alle Textnachrichten vom Server sammelt.
@@ -52,7 +54,7 @@ class WebsocketServerIT {
     }
 
     @Test
-    void ping_shouldReturnPong() throws Exception {
+    void ping_gibt_pong_zurueck() throws Exception {
         // Erwartung: 1 Antwort vom Server
         WsCollector collector = new WsCollector(1);
 
@@ -74,7 +76,7 @@ class WebsocketServerIT {
     }
 
     @Test
-    void subscribe_shouldReturnInitialCandlesAndQuotes() throws Exception {
+    void abonnieren_liefert_anfangsdaten() throws Exception {
         // Erwartung: mindestens 2 Antworten (candles + quotes)
         WsCollector collector = new WsCollector(2);
 
@@ -97,7 +99,7 @@ class WebsocketServerIT {
     }
 
     @Test
-    void unsubscribe_shouldBeAcceptedWithoutServerError() throws Exception {
+    void abbestellen_laeuft_ohne_fehler() throws Exception {
         // Erwartung: subscribe + unsubscribe laufen ohne Protokollfehler
         WsCollector collector = new WsCollector(2);
 
@@ -126,7 +128,7 @@ class WebsocketServerIT {
 
 > Diese Tests prüfen die Parsing-Logik des Clients. Da der echte Feed extern ist, wird ein lokaler Mock-Feed empfohlen.
 
-### Datei: `backend/src/test/java/de/berlin/htw/boundary/ws/client/QuoteClientParsingIT.java`
+### Datei: `/backend/test/de/berlin/htw/boundary/ws/client/QuoteClientParsingTest.java`
 ```java
 package de.berlin.htw.boundary.ws.client;
 
@@ -139,10 +141,10 @@ import de.berlin.htw.trading.quote.dto.DeltaQuote;
 import de.berlin.htw.trading.quote.dto.Quote;
 import de.berlin.htw.trading.quote.dto.SymbolKey;
 
-class QuoteClientParsingIT {
+class QuoteClientParsingTest {
 
     @Test
-    void deltaFrame_shouldParseAllImportantFields() {
+    void delta_frame_wird_einfach_geparst() {
         // Beispiel aus README-Format: subId:value:secDelta:tickDelta:...
         String frame = "22:49032.7:3:15::::";
 
@@ -157,7 +159,7 @@ class QuoteClientParsingIT {
     }
 
     @Test
-    void initialJson_shouldMapToQuoteRecord() throws Exception {
+    void initial_json_wird_zu_quote() throws Exception {
         // Minimales Initial-JSON wie im Feed (relevante Felder)
         String json = "{" +
                 "\"s\":{\"symbolId\":\"133962\",\"venueId\":\"22\",\"channel\":\"last\"}," +
@@ -188,7 +190,7 @@ class QuoteClientParsingIT {
     }
 
     @Test
-    void symbolKey_shouldBeConstructableForSubscriptionFlow() {
+    void symbol_key_ist_einfach_erstellbar() {
         // Dieses Objekt wird später über SubEvent/UnsubEvent als Nachricht aufgebaut
         SymbolKey key = new SymbolKey("133962", "22", "last");
 
@@ -202,8 +204,8 @@ class QuoteClientParsingIT {
 ---
 
 ## Warum diese Tests zur Aufgabe passen
-- `WebsocketServerIT` prüft genau die geforderten Kernfälle aus README: `ping/pong`, `subscribe`, `unsubscribe`.
-- `QuoteClientParsingIT` deckt die Datenformate aus dem externen Feed ab: Initial-JSON und Delta-Frames.
+- `WebsocketServerTest` prüft genau die geforderten Kernfälle aus README: `ping/pong`, `subscribe`, `unsubscribe`.
+- `QuoteClientParsingTest` deckt die Datenformate aus dem externen Feed ab: Initial-JSON und Delta-Frames.
 - Alle Tests sind minimal, ohne zusätzliche Features.
 
 ## Wichtige praktische Hinweise
